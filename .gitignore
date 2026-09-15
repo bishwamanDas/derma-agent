@@ -1,0 +1,80 @@
+# dependencies
+/node_modules
+/.pnp
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/versions
+
+# testing
+/coverage
+
+# next.js
+/.next/
+/out/
+
+# production
+/build
+
+# misc & OS
+.DS_Store
+*.pem
+Thumbs.db
+desktop.ini
+*.lnk
+
+# debug & logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+*.log
+
+# env files (NEVER commit secrets or real API keys)
+.env*
+!.env.example
+!**/.env.example
+
+# IDE & Editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# AI agent & IDE assistant files
+AGENTS.md
+CLAUDE.md
+GEMINI.md
+.agents/
+.claude/
+.gemini/
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+training/.venv/
+.venv/
+backend/.venv/
+venv/
+ENV/
+
+# training data & intermediate artifacts (regenerate with training/train.py)
+training/data/
+training/artifacts/feat_*.npy
+training/artifacts/lab_*.npy
+training/artifacts/*.pt
+!training/artifacts/head_metrics.json
+!training/artifacts/ft_metrics.json
+
