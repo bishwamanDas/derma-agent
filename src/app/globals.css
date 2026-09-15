@@ -1,0 +1,477 @@
+@import "tailwindcss";
+
+/* -- class-strategy dark mode -- */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* -- theme tokens (map to theme-switchable indirection vars) -- */
+@theme {
+  --color-bg: var(--c-bg);
+  --color-bg-alt: var(--c-bg-alt);
+  --color-text: var(--c-text);
+  --color-muted: var(--c-muted);
+  --color-surface: var(--c-surface);
+  --color-border: var(--c-border);
+  --color-slate-400: var(--c-accent);      /* blue accent (light text) */
+  --color-slate-600: var(--c-accent-deep); /* deep blue text */
+  --color-amber: #f59e0b;
+  --font-heading: var(--font-outfit), sans-serif;
+  --font-body: var(--font-body), sans-serif;
+}
+
+/* -- light theme (default) -- */
+:root {
+  --c-bg: #ffffff;
+  --c-bg-alt: #f8fafc;
+  --c-text: #0f172a;
+  --c-muted: #64748b;
+  --c-surface: rgba(0, 0, 0, 0.02);
+  --c-border: rgba(0, 0, 0, 0.08);
+  --c-accent: #60a5fa;
+  --c-accent-deep: #2563eb;
+
+  /* glass */
+  --glass-bg: rgba(255, 255, 255, 0.4);
+  --glass-border: rgba(255, 255, 255, 0.3);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 0 24px rgba(0, 0, 0, 0.06);
+  --glass-plain-bg: #ffffff;
+  --glass-droplet-bg: rgba(255, 255, 255, 0.6);
+  --glass-droplet-border: rgba(0, 0, 0, 0.08);
+
+  /* misc */
+  --dot-color: rgba(0, 0, 0, 0.06);
+  --hairline: rgba(0, 0, 0, 0.08);
+  --dna-dot-dark: #0f172a;
+  --seq-stroke: #cbd5e1;
+  --seq-fill: #0f172a;
+  --scrollbar-thumb: rgba(0, 0, 0, 0.2);
+
+  /* CTA band */
+  --cta-grad: linear-gradient(135deg, #ffffff, #60a5fa, #e5e5e5, #fbcfe8);
+  --cta-overlay: rgba(255, 255, 255, 0.6);
+
+  color-scheme: light;
+}
+
+/* -- dark theme -- */
+.dark {
+  --c-bg: #000000;
+  --c-bg-alt: #050505;
+  --c-text: #e7eefb;
+  --c-muted: #94a3b8;
+  --c-surface: rgba(255, 255, 255, 0.03);
+  --c-border: rgba(255, 255, 255, 0.1);
+  --c-accent: #60a5fa;
+  --c-accent-deep: #3b82f6;
+
+  /* glass */
+  --glass-bg: rgba(10, 10, 14, 0.65);
+  --glass-border: rgba(255, 255, 255, 0.09);
+  --glass-shadow: 0 8px 32px rgba(0, 0, 0, 0.75), 0 0 24px rgba(0, 0, 0, 0.5);
+  --glass-plain-bg: #050505;
+  --glass-droplet-bg: rgba(15, 15, 20, 0.75);
+  --glass-droplet-border: rgba(255, 255, 255, 0.08);
+
+  /* misc */
+  --dot-color: rgba(255, 255, 255, 0.07);
+  --hairline: rgba(255, 255, 255, 0.1);
+  --dna-dot-dark: #dbe7fb;
+  --seq-stroke: #334155;
+  --seq-fill: #e2e8f0;
+  --scrollbar-thumb: rgba(255, 255, 255, 0.22);
+
+  /* CTA band */
+  --cta-grad: linear-gradient(135deg, #050505, #1d4ed8, #000000, #7c3aed);
+  --cta-overlay: rgba(0, 0, 0, 0.65);
+
+  /*
+   * Invert the default Tailwind palette so components written light-first
+   * (bg-white, text-slate-900, border-slate-200, bg-black ...) flip
+   * automatically in dark mode. slate-400/600 stay mapped to the blue
+   * accent tokens defined in @theme above.
+   */
+  --color-white: #0a0a0f;
+  --color-black: #eef4ff;
+
+  --color-gray-50: #050508;
+  --color-gray-100: #0c0c12;
+  --color-gray-200: #14141e;
+  --color-gray-300: #20202e;
+  --color-gray-400: #8ea0bc;
+  --color-gray-500: #94a3b8;
+  --color-gray-600: #aab8cf;
+  --color-gray-700: #c4cfe1;
+  --color-gray-800: #dbe4f2;
+  --color-gray-900: #eef3fb;
+
+  --color-slate-50: #050508;
+  --color-slate-100: #0e0e16;
+  --color-slate-200: #181824;
+  --color-slate-300: #2a2a3c;
+  --color-slate-500: #94a3b8;
+  --color-slate-700: #cbd5e1;
+  --color-slate-800: #e2e8f0;
+  --color-slate-900: #f1f5f9;
+  --color-slate-950: #f8fafc;
+
+  color-scheme: dark;
+}
+
+
+@layer utilities {
+  .btn-bump:hover {
+    animation: btn-scale 1.2s ease-in-out forwards;
+  }
+  .btn-bump span {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+  }
+  .btn-bump:hover, .btn-bump.is-animating {
+    animation: btn-scale 1.2s ease-in-out forwards;
+  }
+  .btn-bump:hover span, .btn-bump.is-animating span {
+    animation: btn-text-scale 1.2s ease-in-out forwards;
+  }
+
+  .group:hover .group-btn-bump-left, .group.is-animating .group-btn-bump-left {
+    animation: btn-merge-left 1.2s ease-in-out forwards;
+  }
+  .group:hover .group-btn-bump-left span, .group.is-animating .group-btn-bump-left span {
+    animation: btn-text-scale 1.2s ease-in-out forwards;
+  }
+
+  .group:hover .group-btn-bump-right, .group.is-animating .group-btn-bump-right {
+    animation: btn-merge-right 1.2s ease-in-out forwards;
+  }
+  .group:hover .group-btn-bump-right span, .group.is-animating .group-btn-bump-right span {
+    animation: btn-text-scale 1.2s ease-in-out forwards;
+  }
+}
+
+@keyframes btn-merge-left {
+  0% { transform: scale(1) translateX(0); }
+  15% { transform: scale(1.25) translateX(8px); }
+  85% { transform: scale(1.25) translateX(8px); }
+  100% { transform: scale(1) translateX(0); }
+}
+
+@keyframes btn-merge-right {
+  0% { transform: scale(1) translateX(0); }
+  15% { transform: scale(1.25) translateX(-8px); }
+  85% { transform: scale(1.25) translateX(-8px); }
+  100% { transform: scale(1) translateX(0); }
+}
+
+@keyframes btn-scale {
+  0% { transform: scale(1); }
+  15% { transform: scale(1.25); }
+  85% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
+@keyframes btn-text-scale {
+  0% { transform: scale(1); }
+  15% { transform: scale(0.8); }
+  85% { transform: scale(0.8); }
+  100% { transform: scale(1); }
+}
+
+/* -- base -- */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--c-bg);
+  color: var(--c-text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+::selection {
+  background: rgba(96, 165, 250, 0.35);
+  color: var(--c-text);
+}
+
+/* -- scrollbar -- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: var(--c-bg);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--scrollbar-thumb);
+  border-radius: 3px;
+}
+
+/* -- glass variants -- */
+.glass-plain {
+  background: var(--glass-plain-bg);
+}
+
+.glass-frost {
+  background: var(--glass-bg);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid var(--glass-border);
+  border-radius: 1.5rem;
+  box-shadow: var(--glass-shadow);
+}
+
+.glass-droplet {
+  background: var(--glass-droplet-bg);
+  backdrop-filter: blur(20px) saturate(1.5);
+  -webkit-backdrop-filter: blur(20px) saturate(1.5);
+  border: 1px solid var(--glass-droplet-border);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* -- dot grid bg -- */
+.dot-grid {
+  background-image: radial-gradient(var(--dot-color) 1px, transparent 1px);
+  background-size: 32px 32px;
+}
+
+/* -- hairline (theme aware) -- */
+.hairline {
+  border-color: var(--hairline);
+}
+
+/* -- gradient text -- */
+.gradient-text {
+  background: linear-gradient(135deg, var(--c-accent), var(--c-accent-deep));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* -- CTA band -- */
+.cta-gradient {
+  background-image: var(--cta-grad);
+  background-size: 300% 300%;
+}
+.cta-overlay {
+  background-color: var(--cta-overlay);
+}
+
+/* -- glow effects -- */
+.glow-white {
+  box-shadow: 0 0 40px rgba(0, 0, 0, 0.05), 0 0 80px rgba(0, 0, 0, 0.02);
+}
+
+.glow-slate-400 {
+  box-shadow: 0 0 40px rgba(244, 114, 182, 0.2), 0 0 80px rgba(244, 114, 182, 0.1);
+}
+
+/* -- keyframes -- */
+@keyframes marquee {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50% { transform: translate3d(0, -20px, 0); }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translate3d(0, 0, 0) rotate(0deg); }
+  50% { transform: translate3d(0, -12px, 0) rotate(3deg); }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50% { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+@keyframes spin-slow {
+  0% { transform: rotateY(0deg); }
+  100% { transform: rotateY(360deg); }
+}
+
+@keyframes draw-line {
+  0% { stroke-dashoffset: 1000; }
+  100% { stroke-dashoffset: 0; }
+}
+
+@keyframes btn-shimmer {
+  0% { left: -100%; }
+  100% { left: 200%; }
+}
+
+/* -- animation utilities -- */
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animate-marquee-reverse {
+  animation: marquee 30s linear infinite reverse;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animate-float {
+  animation: float 6s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animate-float-slow {
+  animation: float-slow 8s ease-in-out infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animate-shimmer {
+  background-size: 200% 100%;
+  animation: shimmer 3s linear infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 4s ease-in-out infinite;
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-shift 6s ease infinite;
+}
+
+.animate-spin-slow {
+  animation: spin-slow 20s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/*
+ * Honour the OS "reduce motion" setting: infinite decorative loops are the
+ * main source of jank on low-power GPUs, so stop them entirely and keep only
+ * opacity fades, which stay cheap to composite.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse,
+  .animate-float,
+  .animate-float-slow,
+  .animate-shimmer,
+  .animate-pulse-glow,
+  .animate-gradient,
+  .animate-spin-slow,
+  .animate-scan,
+  .dna-dot {
+    animation: none !important;
+    will-change: auto;
+  }
+}
+
+/* -- scan line for analysis animation -- */
+@keyframes scan {
+  0% { top: 0%; opacity: 0; }
+  10% { opacity: 1; }
+  90% { opacity: 1; }
+  100% { top: 100%; opacity: 0; }
+}
+.animate-scan {
+  animation: scan 1.6s ease-in-out infinite;
+}
+
+/* -- btn shimmer overlay -- */
+.btn-shimmer {
+  position: relative;
+  overflow: hidden;
+}
+.btn-shimmer::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 60%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: none;
+}
+.btn-shimmer:hover::after {
+  animation: btn-shimmer 0.6s ease-out forwards;
+}
+
+/* -- section spacing -- */
+.section-pad {
+  padding: 6rem 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .section-pad {
+    padding: 8rem 2rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .section-pad {
+    padding: 10rem 4rem;
+  }
+}
+
+/* DNA dot shimmer */
+@keyframes dna-shimmer {
+  0%, 70%, 100% { opacity: var(--dot-base-op, 0.5); filter: brightness(1); }
+  85% { opacity: 1; filter: brightness(2.5) drop-shadow(0 0 6px currentColor); }
+}
+
+.dna-dot {
+  animation: dna-shimmer 3s ease-in-out infinite;
+}
+
+/* Scroll-to-top floating button */
+.scroll-to-top-btn {
+  background-color: #0f172a;
+  color: #ffffff;
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+.scroll-to-top-btn .arrow-icon {
+  color: #ffffff;
+}
+
+.scroll-to-top-btn .track-circle {
+  stroke: rgba(255, 255, 255, 0.2);
+}
+
+html.dark .scroll-to-top-btn,
+.dark .scroll-to-top-btn {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(0, 0, 0, 0.12) !important;
+  box-shadow: 0 10px 30px rgba(255, 255, 255, 0.22), 0 0 20px rgba(255, 255, 255, 0.1) !important;
+}
+
+html.dark .scroll-to-top-btn .arrow-icon,
+.dark .scroll-to-top-btn .arrow-icon {
+  color: #0f172a !important;
+}
+
+html.dark .scroll-to-top-btn .track-circle,
+.dark .scroll-to-top-btn .track-circle {
+  stroke: rgba(0, 0, 0, 0.15) !important;
+}
