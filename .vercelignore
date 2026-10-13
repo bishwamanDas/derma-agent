@@ -1,0 +1,6 @@
+# Ignore backend and training on Vercel (backend is hosted on Render)
+backend/
+training/
+Dockerfile
+render.yaml
+run-dev.*
