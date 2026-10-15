@@ -11,8 +11,7 @@ import { useCounter } from "@/hooks/useCounter";
 
 gsap.registerPlugin(ScrollTrigger);
 
-/* Real metrics from backend/models/model_card.json (ISIC 2019 test split). */
-const PER_CLASS_RECALL = [65, 79, 69, 75, 72, 78, 63, 94]; // AK BCC BKL DF MEL NV SCC VASC
+const PER_CLASS_RECALL = [65, 79, 69, 75, 72, 78, 63, 94];
 
 function AccuracyContent() {
   const { val: accuracyVal, ref: accuracyRef } = useCounter(75.6, 2000, "%");
@@ -69,7 +68,7 @@ export default function Hero() {
       gsap.fromTo(".hero-char", 
         { color: "#64748b" },
         {
-          color: "#3b82f6", // Tailwind blue-500
+          color: "#3b82f6",
           stagger: 0.04,
           scrollTrigger: {
             trigger: ".hero-text-container",
@@ -124,13 +123,11 @@ export default function Hero() {
 
   return (
     <section ref={sectionRef} id="hero" className="relative min-h-screen flex items-center overflow-hidden dot-grid">
-      {/* --- Background Orbs --- */}
       <GlassOrb size={400} color="rgba(6, 214, 160, 0.12)" blur={80} x={-100} y={-50} delay={0.3} interactive />
       <GlassOrb size={300} color="rgba(124, 58, 237, 0.12)" blur={70} x={700} y={100} delay={0.5} interactive />
       <GlassOrb size={200} color="rgba(0, 240, 255, 0.08)" blur={50} x={500} y={400} delay={0.7} interactive />
       <GlassOrb size={150} color="rgba(168, 85, 247, 0.1)" blur={40} x={100} y={500} delay={0.9} />
 
-      {/* --- Endless scanner animation --- */}
       <div className="hero-anchor absolute -top-32 -left-[500px] w-[500px] h-[500px] z-10 pointer-events-none">
 
         <div className="hero-svg-wrapper absolute top-0 left-0 w-full h-full">
@@ -144,7 +141,6 @@ export default function Hero() {
 
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_60%_at_50%_-20%,rgba(6,214,160,0.08),transparent)] pointer-events-none" />
 
-      {/* --- Hero Content --- */}
       <div className="relative z-20 max-w-7xl mx-auto px-6 pt-32 pb-20 grid lg:grid-cols-2 gap-12 items-center">
 
         <div>
@@ -255,7 +251,6 @@ export default function Hero() {
           </motion.div>
         </div>
 
-        {/* --- Lesion Scanner Visual --- */}
         <motion.div
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -263,10 +258,8 @@ export default function Hero() {
           className="hidden lg:flex items-center justify-center relative"
         >
           <div className="relative w-[340px] h-[340px]">
-            {/* skin-toned disc */}
             <div className="absolute inset-8 rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200 dark:from-amber-900/50 dark:via-orange-900/40 dark:to-amber-950/50 shadow-2xl" />
 
-            {/* lesion */}
             <svg viewBox="0 0 100 100" className="absolute inset-8 opacity-90">
               <path
                 d="M50 28 C63 27, 74 37, 73 50 C72 63, 61 73, 49 72 C36 71, 27 61, 28 49 C29 37, 38 29, 50 28 Z"
@@ -281,23 +274,19 @@ export default function Hero() {
               <circle cx="53" cy="47" r="2.4" fill="#3d2415" opacity="0.8" />
             </svg>
 
-            {/* rotating scan ring (transform-only → GPU composited) */}
             <div className="absolute inset-0 rounded-full border-2 border-dashed border-blue-500/50 animate-[spin_16s_linear_infinite] will-change-transform" />
             <div className="absolute inset-10 rounded-full border border-blue-500/30" />
 
-            {/* scan sweep */}
             <div className="absolute inset-8 overflow-hidden rounded-full">
               <div className="absolute left-0 right-0 h-16 bg-gradient-to-b from-transparent via-blue-500/25 to-transparent animate-scan" />
             </div>
 
-            {/* crosshair ticks */}
             <div className="absolute top-1/2 -left-1 w-6 h-px bg-blue-500/60" />
             <div className="absolute top-1/2 -right-1 w-6 h-px bg-blue-500/60" />
             <div className="absolute left-1/2 -top-1 h-6 w-px bg-blue-500/60" />
             <div className="absolute left-1/2 -bottom-1 h-6 w-px bg-blue-500/60" />
           </div>
 
-          {/* --- Floating Glass Panels --- */}
           <div 
             className="absolute top-10 right-10 w-48 h-[115px] flex flex-col justify-center bg-black/90 backdrop-blur-md rounded-2xl p-4 animate-float-slow shadow-xl cursor-pointer group hover:bg-white hover:scale-110 hover:shadow-[0_0_24px_rgba(59,130,246,0.5)] transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]"
             onMouseEnter={() => setHoveredCard("A")}

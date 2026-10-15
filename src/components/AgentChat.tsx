@@ -32,9 +32,7 @@ import FormattedMessage from "./FormattedMessage";
 
 const API = "/api/ai";
 
-/* ------------------------------------------------------------------ */
-/* Types — mirror the SSE events emitted by backend/agent/core.py      */
-/* ------------------------------------------------------------------ */
+
 
 type TraceEvent =
   | { type: "session"; session_id: string }
@@ -58,9 +56,7 @@ const URGENCY_STYLE: Record<string, { label: string; color: string; bg: string }
   urgent: { label: "Urgent Clinical Review", color: "#ef4444", bg: "rgba(239, 68, 68, 0.08)" },
 };
 
-/* ------------------------------------------------------------------ */
-/* Observation view helper                                            */
-/* ------------------------------------------------------------------ */
+
 
 function observationSummary(ev: Record<string, unknown>): string {
   const tool = String(ev.tool || "");
@@ -212,9 +208,7 @@ function TraceView({ events }: { events: TraceEvent[] }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* ABCDE Morphological Scorecard Component                            */
-/* ------------------------------------------------------------------ */
+
 
 interface ABCDECriterion {
   name: string;
@@ -293,9 +287,7 @@ function ABCDEScorecard({ abcde }: { abcde: Record<string, unknown> }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Report Card with Consultation Export                               */
-/* ------------------------------------------------------------------ */
+
 
 function ReportCard({ report }: { report: Record<string, unknown> }) {
   const [copied, setCopied] = useState(false);
@@ -439,17 +431,14 @@ function ReportCard({ report }: { report: Record<string, unknown> }) {
         </div>
       )}
 
-      {/* ABCDE Scorecard */}
       {abcde && <ABCDEScorecard abcde={abcde} />}
 
-      {/* Clinical Narrative */}
       {(plan.narrative || plan.text) && (
         <div className="text-sm leading-relaxed mb-4 text-text/90 rounded-xl bg-[var(--c-surface)] border border-[var(--hairline)] p-4">
           <FormattedMessage text={plan.narrative || plan.text || ""} />
         </div>
       )}
 
-      {/* Why this urgency */}
       {plan.reasons && plan.reasons.length > 0 && (
         <div className="mb-4 rounded-xl bg-[var(--c-surface)] border border-[var(--hairline)] p-4">
           <div className="text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">
@@ -466,7 +455,6 @@ function ReportCard({ report }: { report: Record<string, unknown> }) {
         </div>
       )}
 
-      {/* Doctor Checklist */}
       {plan.doctor_questions && plan.doctor_questions.length > 0 && (
         <div className="mb-4 rounded-xl bg-[var(--c-surface)] border border-[var(--hairline)] p-4">
           <div className="flex items-center justify-between mb-2">
@@ -511,7 +499,6 @@ function ReportCard({ report }: { report: Record<string, unknown> }) {
         </div>
       )}
 
-      {/* Recommended actions */}
       {plan.tips && plan.tips.length > 0 && (
         <div className="mb-4">
           <div className="text-[10px] uppercase tracking-widest text-muted mb-2 font-bold">
@@ -535,9 +522,7 @@ function ReportCard({ report }: { report: Record<string, unknown> }) {
   );
 }
 
-/* ------------------------------------------------------------------ */
-/* Main Agent Chat Section                                            */
-/* ------------------------------------------------------------------ */
+
 
 export default function AgentChat() {
   const [items, setItems] = useState<ChatItem[]>([]);
@@ -586,7 +571,6 @@ export default function AgentChat() {
     }
   };
 
-  /* Send message/photo to DermaAgent */
   const send = useCallback(
     async (overrideText?: string, overrideImage?: { file: File; preview: string }) => {
       const text = (overrideText !== undefined ? overrideText : input).trim();
@@ -661,7 +645,6 @@ export default function AgentChat() {
         }
       } catch (e) {
         const raw = e instanceof Error ? e.message : String(e);
-        // "Failed to fetch" = browser lost connection (timeout / CORS / backend down)
         const friendly = raw.includes("fetch")
           ? "The backend took too long to respond — please try again in a moment."
           : raw.startsWith("Agent request failed")
@@ -691,7 +674,6 @@ export default function AgentChat() {
     setImage({ file: f, preview: URL.createObjectURL(f) });
   };
 
-  /* Quick load sample lesion */
   const loadSample = async (filename: string, label: string) => {
     try {
       const res = await fetch(`/samples/${filename}`);
@@ -752,7 +734,6 @@ export default function AgentChat() {
 
         <FadeIn delay={0.15}>
           <div className="glass-frost rounded-2xl overflow-hidden border border-[var(--hairline)]">
-            {/* Header bar */}
             <div className="flex items-center justify-between gap-3 px-5 py-3 border-b border-[var(--hairline)] bg-[var(--c-surface)]">
               <div className="flex items-center gap-2.5 min-w-0">
                 <span className="w-8 h-8 rounded-lg bg-blue-500 flex items-center justify-center shrink-0 shadow-sm">
@@ -782,7 +763,6 @@ export default function AgentChat() {
               </div>
             </div>
 
-            {/* Transcript scroll box */}
             <div ref={scrollRef} className="h-[480px] overflow-y-auto px-5 py-4 space-y-4">
               {items.length === 0 && (
                 <div className="h-full flex flex-col items-center justify-center text-center px-4">
@@ -795,7 +775,6 @@ export default function AgentChat() {
                     describe your symptoms, or explore dermatology questions with clinical guidelines.
                   </p>
 
-                  {/* Quick Starter Prompts */}
                   <div className="w-full max-w-lg space-y-2">
                     <div className="text-[10px] uppercase font-bold tracking-wider text-muted mb-1 text-left">
                       Instant 1-Click Clinical Test Samples:
@@ -853,7 +832,6 @@ export default function AgentChat() {
                 </div>
               )}
 
-              {/* Chat Items */}
               {items.map((item, i) => {
                 if (item.kind === "user")
                   return (
@@ -890,7 +868,6 @@ export default function AgentChat() {
                         </div>
                       </div>
 
-                      {/* Interactive suggestion chips */}
                       {item.suggestions && item.suggestions.length > 0 && (
                         <div className="flex flex-wrap gap-2 ml-7 mt-1">
                           {item.suggestions.map((sug) => (
@@ -915,7 +892,6 @@ export default function AgentChat() {
                 return <ReportCard key={i} report={item.report} />;
               })}
 
-              {/* Busy Reasoning Indicator */}
               {busy && (
                 <div className="flex gap-2.5 items-center text-muted text-xs p-2 rounded-xl bg-blue-500/5 border border-blue-500/10 w-fit">
                   <Loader2 size={14} className="animate-spin text-blue-500" />
@@ -924,7 +900,6 @@ export default function AgentChat() {
               )}
             </div>
 
-            {/* Composer Footer */}
             <div className="border-t border-[var(--hairline)] p-3 bg-[var(--c-surface)]">
               {image && (
                 <div className="flex items-center gap-2 mb-2 px-1">

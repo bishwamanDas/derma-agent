@@ -1,15 +1,3 @@
-"""
-Planners: the interchangeable decision-making core of the agents.
-
-A planner answers one question per loop iteration:
-"given the transcript and evidence, what should the agent do next?"
-
-  * PolicyPlanner  — deterministic intelligent clinical engine with natural
-                     language understanding, symptom parsing, knowledge retrieval,
-                     and ABCDE morphological analysis. Zero external deps.
-  * OpenAIPlanner  — real LLM function calling against any OpenAI-compatible
-                     /chat/completions endpoint (OpenAI, Groq, Ollama /v1).
-"""
 from __future__ import annotations
 
 import json
@@ -33,44 +21,32 @@ QUESTION_PATTERNS = [
 
 @dataclass
 class Decision:
-    """What the agent should do next."""
-    kind: str                      # "tool" | "message" | "final"
-    thought: str = ""              # the 'Thought' shown in the trace
-    tool: Optional[str] = None     # for kind == "tool"
+    kind: str
+    thought: str = ""
+    tool: Optional[str] = None
     args: Dict[str, Any] = field(default_factory=dict)
-    text: str = ""                 # for kind == "message"
-    suggestions: List[str] = field(default_factory=list)  # clickable quick-reply chips
-    payload: Dict[str, Any] = field(default_factory=dict)  # for kind == "final"
+    text: str = ""
+    suggestions: List[str] = field(default_factory=list)
+    payload: Dict[str, Any] = field(default_factory=dict)
     planner: str = ""
 
 
 @dataclass
 class AgentState:
-    """Everything a planner is allowed to see."""
     transcript: List[Dict[str, str]]
-    evidence: Dict[str, Any]        # tool outputs collected this session
+    evidence: Dict[str, Any]
     pending_questions: List[Dict[str, str]] = field(default_factory=list)
     asked_about_image: bool = False
-    has_attached_image: bool = False   # image waiting on THIS turn
+    has_attached_image: bool = False
 
 
 class PolicyPlanner:
-    """
-    Intelligent clinical policy engine with symptom parsing, ABCDE computer
-    vision integration, and conversational dermatology question-answering.
-    """
-
     name = "policy-engine (Clinical AI)"
 
     def _report_already_generated(self, ev: Dict[str, Any]) -> bool:
-        """True when the full pipeline has run and a report was already shown."""
         return all(k in ev for k in ("analysis", "abcde", "risk", "condition", "urgency", "doctor_questions"))
 
     def _conversational_followup(self, state: AgentState, last_user: str) -> Decision:
-        """
-        Answer follow-up questions conversationally using existing evidence.
-        Uses regex-based intent detection to pick the right response style.
-        """
         ev = state.evidence
         analysis = ev.get("analysis", {})
         cond = ev.get("condition", {})
@@ -505,10 +481,6 @@ class PolicyPlanner:
 
 
 class OpenAIPlanner:
-    """
-    LLM planner using OpenAI-style function calling over plain HTTP (stdlib urllib).
-    Supports all 9 clinical domain tools.
-    """
 
     def __init__(self, api_key: str, api_base: str, model: str, timeout: int = 60):
         self.name = f"llm:{model}"
@@ -594,6 +566,5 @@ class OpenAIPlanner:
 
 
 def build_planner() -> Any:
-    """LLM planner when configured, deterministic policy otherwise."""
     llm = OpenAIPlanner.from_env()
     return llm or PolicyPlanner()

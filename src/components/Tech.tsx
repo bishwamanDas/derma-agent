@@ -80,11 +80,9 @@ export default function Tech() {
 
   return (
     <section id="technology" ref={sectionRef} className="section-pad relative overflow-hidden">
-      {/* --- Neural Background --- */}
       <NeuralNetwork />
       
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* --- Section Header --- */}
         <FadeIn className="text-center mb-16">
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -118,7 +116,6 @@ export default function Tech() {
             ))}
           </p>
 
-          {/* --- Animated Divider --- */}
           <motion.div
             initial={{ scaleX: 0 }}
             whileInView={{ scaleX: 1 }}
@@ -127,7 +124,6 @@ export default function Tech() {
           />
         </FadeIn>
 
-        {/* --- Tech Cards Grid --- */}
         <div className="grid md:grid-cols-3 gap-6">
           {cards.map((card, i) => (
             <motion.div
@@ -144,15 +140,12 @@ export default function Tech() {
               className={`group relative glass-frost hover:!bg-white ${card.hoverShadow} transition-colors transition-shadow duration-500 rounded-lg p-8 overflow-hidden cursor-default`}
               style={{ transformPerspective: 800 }}
             >
-              {/* --- Top Accent Line --- */}
               <div className={`absolute top-0 left-0 right-0 h-px bg-gradient-to-r ${card.accent} 
                 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left`} />
 
-              {/* --- Shimmer Overlay --- */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700
                 bg-gradient-to-r from-transparent via-white/[0.03] to-transparent animate-shimmer pointer-events-none" />
 
-              {/* --- Card Icon --- */}
               <div className={`w-12 h-12 rounded-md bg-gradient-to-br ${card.accent} 
                 flex items-center justify-center mb-6 
                 group-hover:shadow-lg group-hover:shadow-blue-400/20 transition-shadow duration-300`}>

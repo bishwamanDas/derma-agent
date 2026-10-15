@@ -26,7 +26,6 @@ const AnimatedHighlight = ({ label, valNum, suffix }: { label: string, valNum: n
       onMouseEnter={runAnimation}
       className="about-highlight group relative h-24 rounded-2xl overflow-hidden cursor-default border-0 bg-black/[0.02] dark:bg-white/[0.04] backdrop-blur-sm transition-all duration-300"
     >
-      {/* Always-visible content */}
       <div className="absolute inset-0 flex flex-col justify-center p-4 transition-all duration-300 group-hover:opacity-0 group-hover:translate-y-2">
         <div className="text-2xl font-bold font-heading text-slate-900 dark:!text-[#ffffff]">
           <motion.span>{rounded}</motion.span>{suffix}
@@ -36,7 +35,6 @@ const AnimatedHighlight = ({ label, valNum, suffix }: { label: string, valNum: n
         </div>
       </div>
 
-      {/* Hover reveal — blue gradient sweep fading to transparent */}
       <div 
         className="absolute inset-0 z-10 flex flex-col justify-center p-4 rounded-l-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-transparent shadow-lg transition-all duration-300 ease-out pointer-events-none [clip-path:polygon(0_0,0_0,0_100%,0_100%)] group-hover:[clip-path:polygon(0_0,100%_0,100%_100%,0_100%)]"
       >
@@ -180,10 +178,8 @@ export default function About() {
 
         <FadeIn direction="right" delay={0.3} className="hidden lg:flex justify-center items-center relative">
           <div className="about-anchor relative w-[320px] h-[320px]">
-            {/* skin-toned disc */}
             <div className="absolute inset-6 rounded-full bg-gradient-to-br from-amber-100 via-orange-100 to-amber-200 dark:from-amber-900/50 dark:via-orange-900/40 dark:to-amber-950/50 shadow-2xl" />
 
-            {/* lesion */}
             <svg viewBox="0 0 100 100" className="absolute inset-6 opacity-90">
               <path
                 d="M50 28 C63 27, 74 37, 73 50 C72 63, 61 73, 49 72 C36 71, 27 61, 28 49 C29 37, 38 29, 50 28 Z"
@@ -197,16 +193,13 @@ export default function About() {
               />
             </svg>
 
-            {/* rotating scan ring (transform-only → GPU composited) */}
             <div className="absolute inset-0 rounded-full border-2 border-dashed border-blue-500/50 animate-[spin_18s_linear_infinite] will-change-transform" />
             <div className="absolute inset-14 rounded-full border border-blue-500/30" />
 
-            {/* scan sweep */}
             <div className="absolute inset-6 overflow-hidden rounded-full">
               <div className="absolute left-0 right-0 h-14 bg-gradient-to-b from-transparent via-blue-500/25 to-transparent animate-scan" />
             </div>
 
-            {/* ABCDE tick labels */}
             {["A", "B", "C", "D", "E"].map((l, i) => {
               const angle = (i / 5) * Math.PI * 2 - Math.PI / 2;
               const r = 175;

@@ -1,7 +1,3 @@
-"""
-Generates 3 realistic synthetic dermoscopy demonstration samples
-for 1-click testing in the web UI.
-"""
 import os
 import numpy as np
 from PIL import Image, ImageFilter, ImageDraw
@@ -10,7 +6,6 @@ OUTPUT_DIR = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", "publ
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def generate_nevus():
-    """Benign, symmetrical, uniform brown/tan round lesion."""
     size = 256
     img = Image.new("RGB", (size, size), (225, 195, 175))
     draw = ImageDraw.Draw(img)
@@ -32,7 +27,6 @@ def generate_nevus():
     print(f"Created {path}")
 
 def generate_melanoma():
-    """Suspicious, highly asymmetric, irregular border, multi-color variegation."""
     size = 256
     img = Image.new("RGB", (size, size), (220, 190, 170))
     noise = np.random.normal(0, 5, (size, size, 3)).astype(np.int16)
@@ -63,7 +57,6 @@ def generate_melanoma():
     print(f"Created {path}")
 
 def generate_bcc():
-    """Basal Cell Carcinoma: pearly lesion with fine arborizing vessels and pink hue."""
     size = 256
     img = Image.new("RGB", (size, size), (228, 200, 185))
     noise = np.random.normal(0, 4, (size, size, 3)).astype(np.int16)

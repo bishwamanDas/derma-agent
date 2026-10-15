@@ -83,12 +83,7 @@
   --cta-grad: linear-gradient(135deg, #050505, #1d4ed8, #000000, #7c3aed);
   --cta-overlay: rgba(0, 0, 0, 0.65);
 
-  /*
-   * Invert the default Tailwind palette so components written light-first
-   * (bg-white, text-slate-900, border-slate-200, bg-black ...) flip
-   * automatically in dark mode. slate-400/600 stay mapped to the blue
-   * accent tokens defined in @theme above.
-   */
+  /* invert palette in dark mode */
   --color-white: #0a0a0f;
   --color-black: #eef4ff;
 
@@ -365,11 +360,7 @@ body {
   backface-visibility: hidden;
 }
 
-/*
- * Honour the OS "reduce motion" setting: infinite decorative loops are the
- * main source of jank on low-power GPUs, so stop them entirely and keep only
- * opacity fades, which stay cheap to composite.
- */
+/* prefers-reduced-motion override */
 @media (prefers-reduced-motion: reduce) {
   .animate-marquee,
   .animate-marquee-reverse,

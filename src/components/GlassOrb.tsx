@@ -60,9 +60,7 @@ export default function GlassOrb({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 1.2, delay, ease: "easeOut" }}
         style={{
-          /* The radial gradient already fades to transparent, so a small blur
-             is enough — the old blur(80px) + feTurbulence SVG filter forced an
-             expensive offscreen buffer and caused visible jank on weak GPUs. */
+          // cap blur for performance
           background: `radial-gradient(circle, ${color} 0%, ${color} 25%, transparent 72%)`,
           filter: `blur(${Math.min(blur, 24)}px)`,
           transform: "translateZ(0)",

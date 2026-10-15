@@ -7,8 +7,7 @@ VENV="backend/.venv"
 if [ ! -d "$VENV" ]; then
   echo "Creating Python venv..."
   python3 -m venv "$VENV"
-  # pip builds overflow the small /tmp tmpfs in sandboxed environments —
-  # keep the build dir on the main disk.
+  # build on disk to prevent /tmp exhaustion
   TMPDIR="$PWD/.piptmp" "$VENV/bin/pip" install --no-cache-dir -r backend/requirements.txt
 fi
 

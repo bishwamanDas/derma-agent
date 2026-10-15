@@ -1,12 +1,3 @@
-"""
-Disease knowledge base for the Smart Dermatology classifier.
-
-Class codes follow the ISIC 2019 taxonomy. Care tips are adapted from the
-original Smart Dermatology desktop application (Tkinter prototype) and merged
-where ISIC taxonomy consolidates classes (BKL covers both seborrheic and
-pigmented benign keratosis).
-"""
-
 DISEASES = {
     "AK": {
         "name": "Actinic Keratosis",

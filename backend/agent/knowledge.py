@@ -1,7 +1,3 @@
-"""
-Clinical dermatology knowledge base, clinical question search,
-and doctor consultation checklist generator.
-"""
 from __future__ import annotations
 
 import re
@@ -251,10 +247,8 @@ GENERAL_TOPICS = {
 
 
 def search_knowledge(query: str, condition: Optional[str] = None) -> Dict[str, Any]:
-    """Searches clinical knowledge for queries or conditions."""
     query_lower = query.lower().strip()
     
-    # 1. Condition lookup
     cond_code = None
     if condition and condition.upper() in CLINICAL_KNOWLEDGE:
         cond_code = condition.upper()
@@ -284,7 +278,6 @@ def search_knowledge(query: str, condition: Optional[str] = None) -> Dict[str, A
             ),
         }
 
-    # 2. General topics lookup
     for topic_key, content in GENERAL_TOPICS.items():
         if topic_key in query_lower or any(word in query_lower for word in topic_key.split("_")):
             return {
@@ -294,7 +287,6 @@ def search_knowledge(query: str, condition: Optional[str] = None) -> Dict[str, A
                 "summary": content,
             }
 
-    # 3. Default search summary
     return {
         "type": "general",
         "summary": (
@@ -307,7 +299,6 @@ def search_knowledge(query: str, condition: Optional[str] = None) -> Dict[str, A
 
 
 def parse_symptoms(text: str) -> Dict[str, Any]:
-    """Parses reported patient symptoms from conversational text."""
     lower = text.lower()
     flags: List[str] = []
     score = 0
@@ -351,7 +342,6 @@ def parse_symptoms(text: str) -> Dict[str, Any]:
 
 
 def build_doctor_questions(condition_code: str, urgency: str, symptoms: List[str]) -> List[str]:
-    """Generates tailored questions for the patient to ask their dermatologist."""
     code = condition_code.upper()
     questions: List[str] = [
         "What specific dermatoscopic features are visible on this lesion?",

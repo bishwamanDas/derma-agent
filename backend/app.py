@@ -1,25 +1,13 @@
-"""
-Helix-Derm inference API.
-
-Serves the fine-tuned skin-lesion classifier (TorchScript, exported by
-training/train.py) over a small FastAPI surface that the Next.js frontend
-proxies at /api/ai/*.
-
-Endpoints
-  GET  /api/health      -> liveness + model status
-  GET  /api/model-info  -> architecture, dataset and accuracy metrics
-  POST /api/predict     -> multipart image upload -> top-3 predictions + guidance
-"""
 import io
 import json
 import os
 
-# Load .env file (GEMINI_API_KEY etc.) -- best-effort, no hard dependency
+# load .env if available
 try:
     from dotenv import load_dotenv
     load_dotenv()
 except ImportError:
-    pass  # dotenv not installed; user must export env vars manually
+    pass
 import time
 
 import numpy as np
@@ -92,7 +80,7 @@ def preprocess(raw: bytes) -> torch.Tensor:
         img = Image.open(io.BytesIO(raw))
     except Exception:
         raise HTTPException(400, "Could not decode the uploaded file as an image.")
-    img = ImageOps.exif_transpose(img)  # respect phone orientation
+    img = ImageOps.exif_transpose(img)
     img = img.convert("RGB")
     img = img.resize((IMG_SIZE, IMG_SIZE), Image.Resampling.LANCZOS)
     arr = np.asarray(img, dtype=np.float32) / 255.0
@@ -102,11 +90,6 @@ def preprocess(raw: bytes) -> torch.Tensor:
 
 
 def classify(raw: bytes) -> dict:
-    """Run the classifier over raw image bytes and return the full result dict.
-
-    Shared by POST /api/predict and the agentic pipeline, which calls this as
-    its `analyze_image` tool, so both paths report identical numbers.
-    """
     if model is None:
         raise HTTPException(503, "Model not loaded. Run training/train.py first.")
     x = preprocess(raw)
@@ -159,9 +142,7 @@ async def predict(file: UploadFile = File(...)):
     return classify(raw)
 
 
-# ---------------------------------------------------------------------------
-# DermaAgent — agentic triage (see backend/agent/ and docs/AGENT.md)
-# ---------------------------------------------------------------------------
+# agent routes
 from fastapi import Form
 from fastapi.responses import StreamingResponse
 
@@ -220,12 +201,11 @@ async def agent_chat(
             image_bytes = None
 
     def event_stream():
-        # first event tells the client which session this run belongs to
         yield f"data: {json.dumps({'type': 'session', 'session_id': mem.session_id})}\n\n"
         try:
             for ev in orchestrator.run(mem, message, image_bytes):
                 yield f"data: {json.dumps(ev, default=str)}\n\n"
-        except Exception as exc:  # never leave the client hanging
+        except Exception as exc:
             yield f"data: {json.dumps({'type': 'error', 'message': str(exc)})}\n\n"
             yield f"data: {json.dumps({'type': 'done', 'finished': False})}\n\n"
 

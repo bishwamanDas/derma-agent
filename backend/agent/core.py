@@ -1,15 +1,3 @@
-"""
-Agent core: supervisor orchestration over intake, triage, and care advisor agents.
-
-Multi-Agent Clinical Pipeline:
-1. Intake: extracts patient symptoms and conversational queries.
-2. Vision Specialist: runs MobileNetV3 CNN + morphological ABCDE extraction.
-3. Clinical Triage: fuses vision, risk factors, symptoms, and temporal history into urgency.
-4. Care Advisor: writes structured clinical triage report, doctor questions, and recommendations.
-5. Follow-up: LLM-powered (Gemini) conversational Q&A using gathered evidence.
-
-Every step is emitted as an event so the frontend can render the live reasoning trace.
-"""
 from __future__ import annotations
 
 import time
@@ -44,7 +32,6 @@ class RunResult:
 
 @dataclass
 class TriageAgent:
-    """Gathers clinical evidence using the tool registry."""
     name: str = "triage-agent"
     planner: Any = None
     allowed_tools: List[str] = field(default_factory=lambda: [
@@ -56,7 +43,6 @@ class TriageAgent:
 
 @dataclass
 class AdvisorAgent:
-    """Turns multi-modal clinical evidence into a patient-facing care plan."""
     name: str = "care-advisor"
     llm: Any = None
 
@@ -138,7 +124,6 @@ class AdvisorAgent:
         }
 
     def _llm_plan(self, ev: Dict[str, Any], base: Dict[str, Any]) -> Optional[str]:
-        """Ask LLM to summarize care plan in compassionate, patient-friendly language."""
         import json
         try:
             resp = self.llm._chat([
@@ -158,8 +143,6 @@ class AdvisorAgent:
 
 
 class Orchestrator:
-    """Supervisor: coordinates intake, triage, and advisor agents."""
-
     def __init__(self, registry: Optional[ToolRegistry] = None):
         self.registry = registry or build_registry()
         self.planner = build_planner()
@@ -297,13 +280,11 @@ class Orchestrator:
 
     @staticmethod
     def _report_already_shown(memory: Memory) -> bool:
-        """True when the triage report has already been emitted in the conversation."""
         return any("[report]" in m.get("content", "")
                    for m in memory.conversation if m["role"] == "assistant")
 
     @staticmethod
     def _all_evidence_gathered(evidence: Dict[str, Any]) -> bool:
-        """True when all pipeline stages have run."""
         return all(k in evidence for k in
                    ("analysis", "abcde", "risk", "condition", "urgency", "doctor_questions"))
 

@@ -5,12 +5,6 @@ import { motion, AnimatePresence } from "framer-motion";
 import FadeIn from "./FadeIn";
 import { ArrowRight, RotateCcw, ShieldAlert } from "lucide-react";
 
-/**
- * Risk factors are the standard ones cited by skin-cancer public-health
- * guidance (phototype, UV exposure, burns, solarium use, mole burden,
- * family history, age). Points are illustrative weights for a self-check —
- * this is education, not a clinical instrument.
- */
 type Question = {
   q: string;
   hint?: string;
@@ -147,7 +141,7 @@ export default function RiskCheck() {
         gsap.fromTo(".risk-char", 
           { color: "#64748b" },
           {
-            color: "#3b82f6", // Tailwind blue-500
+            color: "#3b82f6",
             stagger: 0.04,
             scrollTrigger: {
               trigger: ".risk-text-container",
@@ -230,7 +224,6 @@ export default function RiskCheck() {
 
         <FadeIn delay={0.15}>
           <div className="glass-frost rounded-2xl p-8 sm:p-10 min-h-[420px] relative">
-            {/* progress */}
             <div className="h-1 w-full rounded-full bg-slate-900/10 dark:bg-white/10 mb-8 overflow-hidden">
               <motion.div
                 className={`h-full ${done ? level.ring : "bg-blue-500"}`}

@@ -1,8 +1,3 @@
-"""
-Computer vision feature extraction for dermatological ABCDE criteria.
-Uses NumPy and PIL to calculate morphological parameters, contour geometry,
-and color variegation metrics from a raw dermoscopy photo.
-"""
 from __future__ import annotations
 
 import io
@@ -12,26 +7,19 @@ from PIL import Image, ImageOps, ImageFilter
 
 
 def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = None) -> Dict[str, Any]:
-    """
-    Extracts numerical and qualitative ABCDE metrics from lesion image bytes.
-    Returns:
-        dict with scores (0-10), qualitative descriptors, and visual findings.
-    """
     try:
         img = Image.open(io.BytesIO(raw_bytes))
         img = ImageOps.exif_transpose(img).convert("RGB")
     except Exception:
         return _fallback_abcde()
 
-    # Resize to standardized analysis size
     img = img.resize((160, 160), Image.Resampling.BILINEAR)
     arr = np.asarray(img, dtype=np.float32)
 
-    # 1. Segment lesion from background skin
-    # Skin in dermoscopy is usually brighter with lower saturation; lesions are darker/pigmented
+    # 1. Segment lesion from background
     gray = 0.2989 * arr[:, :, 0] + 0.5870 * arr[:, :, 1] + 0.1140 * arr[:, :, 2]
     
-    # Corner pixels represent background skin
+    # background skin estimate from corners
     corners = np.concatenate([
         gray[:20, :20].flatten(),
         gray[:20, -20:].flatten(),
@@ -40,29 +28,25 @@ def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = Non
     ])
     skin_val = np.median(corners)
     
-    # Lesion mask (pixels distinctly darker than surrounding skin)
     threshold = skin_val - max(15.0, np.std(corners) * 1.5)
     mask = gray < threshold
 
-    # If mask is too tiny or fills whole image, use Otsu-like percentile
+    # fallback threshold
     mask_pixels = np.sum(mask)
     if mask_pixels < 200 or mask_pixels > 160 * 160 * 0.9:
         p25 = np.percentile(gray, 30)
         mask = gray < p25
 
-    # 2. Asymmetry (A)
-    # Centroid of lesion
+    # 2. Asymmetry
     y_coords, x_coords = np.where(mask)
     if len(x_coords) > 50:
         cx = int(np.mean(x_coords))
         cy = int(np.mean(y_coords))
         
-        # Crop centered box around centroid
         half = min(cx, 160 - cx, cy, 160 - cy)
         half = max(half, 20)
         box = mask[cy - half:cy + half, cx - half:cx + half]
         
-        # Horizontal & Vertical reflection overlap
         flipped_h = np.fliplr(box)
         flipped_v = np.flipud(box)
         
@@ -70,7 +54,6 @@ def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = Non
         iou_v = np.sum(box & flipped_v) / max(1, np.sum(box | flipped_v))
         avg_symmetry = (iou_h + iou_v) / 2.0
         
-        # Asymmetry score 0 (perfect symmetry) to 10 (extreme asymmetry)
         asymmetry_score = round(float(np.clip((1.0 - avg_symmetry) * 15.0, 0.5, 9.8)), 1)
     else:
         asymmetry_score = 4.0
@@ -85,14 +68,12 @@ def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = Non
         a_label = "Marked Asymmetry"
         a_desc = "Significant contour asymmetry across both axes (elevated concern)."
 
-    # 3. Border Irregularity (B)
-    # Measure border gradients & compactness
+    # 3. Border Irregularity
     grad_y = np.abs(np.diff(mask.astype(float), axis=0))
     grad_x = np.abs(np.diff(mask.astype(float), axis=1))
     perimeter = np.sum(grad_y) + np.sum(grad_x)
     area = max(1, np.sum(mask))
     
-    # Compactness P^2 / (4 * pi * A); for circle = 1.0, notched/scalloped > 1.8
     compactness = (perimeter ** 2) / (4.0 * np.pi * area)
     border_score = round(float(np.clip(compactness * 2.2, 1.0, 9.8)), 1)
 
@@ -106,7 +87,7 @@ def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = Non
         b_label = "Ill-defined & Jagged"
         b_desc = "Border is ragged, blurred, notched or starburst-like."
 
-    # 4. Color Variegation (C)
+    # 4. Color Variegation
     lesion_pixels = arr[mask] if np.sum(mask) > 50 else arr.reshape(-1, 3)
     r = lesion_pixels[:, 0]
     g = lesion_pixels[:, 1]
@@ -114,21 +95,15 @@ def extract_abcde(raw_bytes: bytes, history_scan: Optional[Dict[str, Any]] = Non
     
     color_std = (np.std(r) + np.std(g) + np.std(b)) / 3.0
     
-    # Detect recognizable dermatological pigment colors
     colors_detected: List[str] = []
-    # Tan / light brown
     if np.any((r > 130) & (g > 80) & (b < 100)):
         colors_detected.append("Tan / Light Brown")
-    # Dark brown
     if np.any((r > 60) & (r < 120) & (g < 80) & (b < 60)):
         colors_detected.append("Dark Brown")
-    # Deep Black / slate
     if np.any((r < 50) & (g < 50) & (b < 50)):
         colors_detected.append("Black / Deep Melanin")
-    # Erythema / red vascular
     if np.any((r > 140) & (g < 70) & (b < 80)):
         colors_detected.append("Erythema / Red")
-    # Slate grey / blue-white veil
     if np.any((b > r * 1.05) & (b > 60)):
         colors_detected.append("Slate Blue / Grey")
 

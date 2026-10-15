@@ -22,7 +22,7 @@ export default function LesionTracks({ className = "" }: { className?: string })
       y: 5 + i * (90 / numTracks),
       reads: Array.from({ length: Math.floor(random() * 5 + 5) }).map((_, j) => {
         const type = Math.floor(random() * 4);
-        const colors = ["#10b981", "#f43f5e", "#3b82f6", "#f59e0b"]; // A, T, C, G
+        const colors = ["#10b981", "#f43f5e", "#3b82f6", "#f59e0b"];
         const letters = ["A", "T", "C", "G"];
         return {
           id: `${i}-${j}`,

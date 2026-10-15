@@ -1,10 +1,3 @@
-"""
-Tool registry for the triage agents.
-
-A Tool is a callable with a JSON-schema description — the same shape an LLM
-function-calling API expects, so the identical registry feeds both the
-deterministic PolicyPlanner and a real LLM.
-"""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -25,11 +18,10 @@ from agent.knowledge import (
 class Tool:
     name: str
     description: str
-    parameters: Dict[str, Any]  # JSON Schema
+    parameters: Dict[str, Any]
     fn: Callable[[Dict[str, Any], "ToolContext"], Dict[str, Any]]
 
     def to_function_schema(self) -> Dict[str, Any]:
-        """OpenAI function-calling schema for this tool."""
         return {
             "type": "function",
             "function": {
@@ -42,9 +34,8 @@ class Tool:
 
 @dataclass
 class ToolContext:
-    """Per-session state handed to every tool call."""
     session_id: str
-    memory: Any  # agent.memory.Memory (avoid circular import)
+    memory: Any
     pending_image: Optional[bytes] = None
     last_analysis: Optional[Dict[str, Any]] = None
     last_abcde: Optional[Dict[str, Any]] = None
@@ -125,11 +116,7 @@ def _risk_band(score: int) -> str:
     return "high"
 
 
-# --------------------------------------------------------------------------
-# tool implementations
-# --------------------------------------------------------------------------
 def _analyze_image(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Vision tool: runs the ISIC-2019 classifier over the attached photo."""
     import app as inference
 
     if ctx.pending_image is None:
@@ -155,7 +142,6 @@ def _analyze_image(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _extract_abcde_features(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Computer vision tool: extracts ABCDE morphological features from the image."""
     if ctx.pending_image is None:
         return {"status": "no_image", "message": "No image attached for ABCDE analysis."}
     
@@ -169,7 +155,6 @@ def _extract_abcde_features(args: Dict[str, Any], ctx: ToolContext) -> Dict[str,
 
 
 def _assess_risk(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Scores answered risk factors; returns band + still-missing factors."""
     answers: Dict[str, bool] = ctx.memory.risk_answers
     answers.update({k: bool(v) for k, v in (args.get("answers") or {}).items()
                     if k in RISK_FACTORS})
@@ -197,7 +182,6 @@ def _assess_risk(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _lookup_condition(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Knowledge-base tool: clinical description, red flags and care tips."""
     code = str(args.get("condition", "")).upper()
     if code not in DISEASES:
         return {"status": "not_found", "known": sorted(DISEASES)}
@@ -220,7 +204,6 @@ def _lookup_condition(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _compare_history(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Memory tool: how does this scan relate to previous scans in the session?"""
     scans = ctx.memory.scans
     if len(scans) < 2 or ctx.last_analysis is None:
         return {
@@ -253,7 +236,6 @@ def _compare_history(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _check_urgency(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Decision tool: fuses vision output, ABCDE criteria, risk band, symptoms into urgency."""
     analysis = ctx.last_analysis
     top = None
     if analysis is not None:
@@ -275,7 +257,6 @@ def _check_urgency(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
         if ctx.memory.risk_answers else "unknown"
     history_note = args.get("history_changed", False)
 
-    # Base severity score: low=0, moderate=1, high=2
     score = {"low": 0, "moderate": 1, "high": 2}[sev]
     reasons = {
         "low": ["What I identified is clinically classified as usually harmless."],
@@ -293,13 +274,11 @@ def _check_urgency(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
         score += 1
         reasons.append("Morphological change detected versus previous session scan (evolution is a key red flag).")
 
-    # Factor in ABCDE findings if available
     abcde = ctx.last_abcde or {}
     if abcde.get("overall_band") == "High Concern":
         score += 1
         reasons.append("Computer vision detected marked ABCDE asymmetry and border/color variegation.")
 
-    # Factor in symptoms
     if ctx.symptoms:
         score += 1
         reasons.append(f"Reported patient symptoms: {', '.join(ctx.symptoms[:2])}.")
@@ -318,14 +297,12 @@ def _check_urgency(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _search_clinical_knowledge(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Retrieval tool: searches clinical dermatology database and guidelines."""
     query = str(args.get("query", ""))
     cond = str(args.get("condition", "")) or None
     return search_knowledge(query, cond)
 
 
 def _analyze_symptoms(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Symptom tool: parses patient-reported symptoms and red flags."""
     text = str(args.get("text", ""))
     res = parse_symptoms(text)
     if res.get("symptoms_detected"):
@@ -334,7 +311,6 @@ def _analyze_symptoms(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
 
 
 def _generate_doctor_questions(args: Dict[str, Any], ctx: ToolContext) -> Dict[str, Any]:
-    """Guidance tool: formulates prioritized checklist for dermatologist visit."""
     cond = str(args.get("condition", ""))
     if not cond and ctx.last_analysis:
         cond = ctx.last_analysis.get("top", {}).get("code", "")

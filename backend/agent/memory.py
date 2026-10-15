@@ -1,15 +1,3 @@
-"""
-Agent memory.
-
-Two layers, both scoped to a chat session:
-
-  * conversation — the chat transcript the planners reason over
-  * factual      — structured evidence: scans (long-term style records) and
-                   risk-factor answers, queryable by tools mid-run
-
-In-memory only by design (no server-side persistence of medical images);
-swap MemoryStore for Redis/SQLite to make it durable.
-"""
 from __future__ import annotations
 
 import time
@@ -67,7 +55,6 @@ class Memory:
         return rec
 
     def summary(self) -> Dict[str, Any]:
-        """Compact factual snapshot planners can be handed."""
         return {
             "scans": [s.as_dict() for s in self.scans],
             "risk_answers": dict(self.risk_answers),
@@ -76,8 +63,6 @@ class Memory:
 
 
 class MemoryStore:
-    """Session store. In-process; a durable backend slots in behind this API."""
-
     def __init__(self, ttl_seconds: int = 3600) -> None:
         self._sessions: Dict[str, Memory] = {}
         self._ttl = ttl_seconds

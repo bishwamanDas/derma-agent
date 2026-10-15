@@ -1,17 +1,5 @@
 #!/usr/bin/env python
-"""
-Helix-Derm skin lesion classifier — training pipeline.
-
-Dataset: ISIC 2019 (8 classes: AK, BCC, BKL, DF, MEL, NV, SCC, VASC), stored as
-parquet with raw 128x128x3 RGB uint8 bytes per image.
-
-Phases (run in order):
-  python train.py convert    # parquet -> npy memmap arrays
-  python train.py extract    # frozen-backbone feature cache (train+val+test)
-  python train.py head       # train MLP head on cached features, evaluate
-  python train.py finetune   # fine-tune backbone (top blocks), evaluate each epoch
-  python train.py export     # export best model to TorchScript + metrics json
-"""
+# ISIC 2019 MobileNetV3 transfer learning & TorchScript export
 import io
 import json
 import math
@@ -90,7 +78,6 @@ def load_arrays(split):
 
 
 def make_splits():
-    """Deterministic stratified train/val split of the train parquet."""
     path = os.path.join(DATA, "split.json")
     if os.path.exists(path):
         with open(path) as f:
@@ -111,8 +98,6 @@ def make_splits():
 
 
 class ImgDataset(torch.utils.data.Dataset):
-    """uint8 memmap dataset; augmentation applied on tensors when augment=True."""
-
     def __init__(self, indices, split="train", augment=False):
         self.imgs, labels = load_arrays(split)
         self.idx = indices
@@ -175,7 +160,6 @@ def build_backbone(num_classes=0):
 
 
 def backbone_out_dim():
-    """Measure the actual pooled-feature width with a dummy forward pass."""
     m = build_backbone(0).eval()
     with torch.no_grad():
         return int(m(torch.zeros(1, 3, IMG, IMG)).shape[1])
@@ -285,13 +269,6 @@ def accuracy(model, X, y, bs=1024):
 
 # ------------------------------------------------------------------ finetune
 class FullModel(nn.Module):
-    """Backbone (pooled 1280-d features) + MLP head.
-
-    The head mirrors the architecture used in the `head` phase, and is
-    initialized from head_best.pt when present, so fine-tuning starts from the
-    strong frozen-feature solution instead of a random linear layer.
-    """
-
     def __init__(self, num_classes=len(CLASSES)):
         super().__init__()
         self.backbone = build_backbone(0)  # -> pooled features
@@ -323,11 +300,6 @@ def class_weighted_sampler(labels):
 
 
 def finetune(epochs=6, warmup_epochs=2):
-    """Two-phase fine-tune:
-    Phase A (warmup_epochs): backbone frozen, only the fresh classifier trains
-    at a high LR — prevents destroying ImageNet features with random-head
-    gradients. Phase B: full network, discriminative LRs (backbone ~10x lower).
-    """
     tr, va = make_splits()
     dtr = ImgDataset(tr, "train", augment=True)
     dva = ImgDataset(va, "train", augment=False)
@@ -429,7 +401,6 @@ def finetune(epochs=6, warmup_epochs=2):
 
 
 def finetune_more(epochs=6):
-    """Continue training from ft_best.pt with a fresh OneCycle (lower peak LR)."""
     tr, va = make_splits()
     dtr = ImgDataset(tr, "train", augment=True)
     dva = ImgDataset(va, "train", augment=False)

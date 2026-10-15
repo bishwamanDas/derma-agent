@@ -10,7 +10,7 @@ export default function FloatingCells({ className = "" }: { className?: string }
     
     let raf = 0;
     const handleMouseMove = (e: MouseEvent) => {
-      // one update per frame at most — per-event setState made scroll/pan janky
+      // throttle to rAF
       if (raf) return;
       raf = requestAnimationFrame(() => {
         raf = 0;
@@ -24,7 +24,7 @@ export default function FloatingCells({ className = "" }: { className?: string }
           setMousePos((prev) => {
             const dx = svgP.x - prev.x;
             const dy = svgP.y - prev.y;
-            if (dx * dx + dy * dy < 4) return prev; // ignore sub-2-unit moves
+            if (dx * dx + dy * dy < 4) return prev;
             return { x: svgP.x, y: svgP.y };
           });
         }

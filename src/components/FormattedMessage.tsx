@@ -7,21 +7,14 @@ interface FormattedMessageProps {
   className?: string;
 }
 
-/**
- * Parses markdown inline formatting (**bold**, *italic*, `code`)
- * and structured bullet/numbered lists so the agent's responses
- * render as clean, polished clinical typography instead of raw asterisks.
- */
 export default function FormattedMessage({ text, className = "" }: FormattedMessageProps) {
   if (!text) return null;
 
   const renderInline = (str: string) => {
-    // Matches **bold**, *italic*, and `code`
     const regex = /(\*\*[\s\S]+?\*\*|\*[\s\S]+?\*|`[\s\S]+?`)/g;
     const parts = str.split(regex);
 
     return parts.map((part, index) => {
-      // **bold**
       if (part.startsWith("**") && part.endsWith("**") && part.length >= 4) {
         return (
           <strong key={index} className="font-bold text-text">
@@ -29,7 +22,6 @@ export default function FormattedMessage({ text, className = "" }: FormattedMess
           </strong>
         );
       }
-      // *italic*
       if (part.startsWith("*") && part.endsWith("*") && part.length >= 2 && !part.startsWith("**")) {
         return (
           <em key={index} className="italic text-text/90">
@@ -37,7 +29,6 @@ export default function FormattedMessage({ text, className = "" }: FormattedMess
           </em>
         );
       }
-      // `code`
       if (part.startsWith("`") && part.endsWith("`") && part.length >= 2) {
         return (
           <code
@@ -70,14 +61,12 @@ export default function FormattedMessage({ text, className = "" }: FormattedMess
   lines.forEach((line, idx) => {
     const trimmed = line.trim();
 
-    // Empty line separator
     if (!trimmed) {
       flushList();
       elements.push(<div key={`space-${idx}`} className="h-1.5" />);
       return;
     }
 
-    // Bullet point: "• item", "- item", "* item", or "1. item"
     const bulletMatch = trimmed.match(/^([•\-\*]|\d+[\.\)])\s+(.+)$/);
     if (bulletMatch) {
       const prefix = bulletMatch[1];
@@ -97,7 +86,6 @@ export default function FormattedMessage({ text, className = "" }: FormattedMess
       return;
     }
 
-    // Regular text line
     flushList();
     elements.push(
       <p key={`p-${idx}`} className="leading-relaxed mb-1 last:mb-0 text-text/90">

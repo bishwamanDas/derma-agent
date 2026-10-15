@@ -27,10 +27,6 @@ import {
 import FadeIn from "./FadeIn";
 import NeuralNetwork from "./NeuralNetwork";
 
-/* ------------------------------------------------------------------ */
-/* types                                                               */
-/* ------------------------------------------------------------------ */
-
 type Prediction = { code: string; name: string; probability: number };
 type TopPrediction = Prediction & {
   severity: "low" | "moderate" | "high";
@@ -71,10 +67,6 @@ const HISTORY_KEY = "helix-derm-history";
 const MAX_HISTORY = 6;
 const API = "/api/ai";
 
-/* ------------------------------------------------------------------ */
-/* helpers                                                             */
-/* ------------------------------------------------------------------ */
-
 function fileToThumb(file: File, size = 96): Promise<string> {
   return new Promise((resolve, reject) => {
     const url = URL.createObjectURL(file);
@@ -113,10 +105,6 @@ function loadHistory(): HistoryItem[] {
     return [];
   }
 }
-
-/* ------------------------------------------------------------------ */
-/* camera modal                                                        */
-/* ------------------------------------------------------------------ */
 
 function CameraModal({
   onCapture,
@@ -223,10 +211,6 @@ function CameraModal({
     </motion.div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/* main section                                                        */
-/* ------------------------------------------------------------------ */
 
 export default function SkinAnalysis() {
   const [isBadgeHovered, setIsBadgeHovered] = useState(false);
@@ -376,7 +360,6 @@ export default function SkinAnalysis() {
       <NeuralNetwork className="opacity-40" />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        {/* ---------------- header ---------------- */}
         <FadeIn className="text-center mb-14">
           <motion.div
             whileHover={{ scale: 1.1 }}
@@ -405,9 +388,7 @@ export default function SkinAnalysis() {
           </p>
         </FadeIn>
 
-        {/* ---------------- main grid ---------------- */}
         <div className="grid lg:grid-cols-2 gap-6 items-stretch">
-          {/* -------- upload card -------- */}
           <FadeIn direction="left" className="h-full">
             <div className="glass-frost p-6 sm:p-8 h-full flex flex-col">
               <div className="flex items-center gap-3 mb-6">
@@ -529,7 +510,6 @@ export default function SkinAnalysis() {
             </div>
           </FadeIn>
 
-          {/* -------- results card -------- */}
           <FadeIn direction="right" className="h-full">
             <div className="glass-frost p-6 sm:p-8 h-full flex flex-col">
               <div className="flex items-center gap-3 mb-6">
@@ -584,7 +564,6 @@ export default function SkinAnalysis() {
                     exit={{ opacity: 0 }}
                     transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
                   >
-                    {/* headline */}
                     <div className="flex items-start justify-between gap-4 mb-5">
                       <div>
                         <div className="text-xs uppercase tracking-widest text-muted mb-1">
@@ -605,7 +584,6 @@ export default function SkinAnalysis() {
                       </span>
                     </div>
 
-                    {/* confidence bars */}
                     <div className="space-y-3 mb-5">
                       {result.predictions.map((p, i) => (
                         <div key={p.code}>
@@ -633,7 +611,6 @@ export default function SkinAnalysis() {
                       ))}
                     </div>
 
-                    {/* advice */}
                     <div className="rounded-xl p-4 mb-5 bg-[var(--c-surface)] border border-[var(--hairline)]">
                       <p className="text-sm font-medium flex items-center gap-2 mb-2">
                         <Stethoscope size={15} className="text-blue-500" />
@@ -712,9 +689,7 @@ export default function SkinAnalysis() {
           </FadeIn>
         </div>
 
-        {/* ---------------- bottom cards ---------------- */}
         <div className="grid md:grid-cols-3 gap-6 mt-6">
-          {/* model transparency */}
           <FadeIn delay={0.05} className="h-full">
             <motion.div
               whileHover={{
@@ -724,10 +699,7 @@ export default function SkinAnalysis() {
               className="group relative glass-frost hover:!bg-white hover:!shadow-[0_0_40px_rgba(59,130,246,0.5)] transition-all duration-500 rounded-2xl p-6 h-full overflow-hidden cursor-default"
               style={{ transformPerspective: 800 }}
             >
-              {/* --- Top Accent Line --- */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-blue-400 to-indigo-500 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-
-              {/* --- Shimmer Overlay --- */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-shimmer pointer-events-none" />
 
               <h4 className="font-heading font-bold flex items-center gap-2 mb-3">
@@ -779,7 +751,6 @@ export default function SkinAnalysis() {
             </motion.div>
           </FadeIn>
 
-          {/* how it works */}
           <FadeIn delay={0.15} className="h-full">
             <motion.div
               whileHover={{
@@ -789,10 +760,7 @@ export default function SkinAnalysis() {
               className="group relative glass-frost hover:!bg-white hover:!shadow-[0_0_40px_rgba(96,165,250,0.5)] transition-all duration-500 rounded-2xl p-6 h-full overflow-hidden cursor-default"
               style={{ transformPerspective: 800 }}
             >
-              {/* --- Top Accent Line --- */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-blue-400 to-blue-200 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-
-              {/* --- Shimmer Overlay --- */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-shimmer pointer-events-none" />
 
               <h4 className="font-heading font-bold flex items-center gap-2 mb-3">
@@ -816,7 +784,6 @@ export default function SkinAnalysis() {
             </motion.div>
           </FadeIn>
 
-          {/* ABCDE */}
           <FadeIn delay={0.25} className="h-full">
             <motion.div
               whileHover={{
@@ -826,10 +793,7 @@ export default function SkinAnalysis() {
               className="group relative glass-frost hover:!bg-white hover:!shadow-[0_0_40px_rgba(245,158,11,0.4)] transition-all duration-500 rounded-2xl p-6 h-full overflow-hidden cursor-default"
               style={{ transformPerspective: 800 }}
             >
-              {/* --- Top Accent Line --- */}
               <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-amber-400 to-yellow-400 scale-x-0 group-hover:scale-x-100 transition-transform duration-500 origin-left" />
-
-              {/* --- Shimmer Overlay --- */}
               <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 bg-gradient-to-r from-transparent via-white/[0.04] to-transparent animate-shimmer pointer-events-none" />
 
               <h4 className="font-heading font-bold flex items-center gap-2 mb-3">
@@ -856,7 +820,6 @@ export default function SkinAnalysis() {
           </FadeIn>
         </div>
 
-        {/* ---------------- disclaimer ---------------- */}
         <FadeIn delay={0.3}>
           <div className="mt-8 rounded-2xl border border-[var(--hairline)] bg-[var(--c-surface)] px-6 py-4 flex gap-3 items-start">
             <Info size={16} className="text-blue-500 mt-0.5 shrink-0" />

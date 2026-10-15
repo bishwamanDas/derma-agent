@@ -1,19 +1,3 @@
-"""
-Lightweight LLM chat for conversational follow-ups.
-
-Uses Google Gemini's free API via the OpenAI-compatible endpoint.
-Falls back gracefully when no key is configured.
-
-**Timeout budget**: the entire `llm_followup()` call is capped at ~10 s
-wall-clock so the backend never hangs long enough for the browser to
-disconnect.  Individual HTTP requests timeout after 8 s, and there are
-NO retries — each model in the fallback chain gets exactly one shot.
-
-Env vars (checked in order):
-  GEMINI_API_KEY          — Google AI Studio key (free at aistudio.google.com)
-  DERM_AGENT_API_KEY      — any OpenAI-compat key
-  OPENAI_API_KEY          — standard OpenAI key
-"""
 from __future__ import annotations
 
 import json
@@ -23,22 +7,9 @@ import urllib.error
 import urllib.request
 from typing import Any, Dict, List, Optional
 
-
-# ── Gemini OpenAI-compat endpoint ───────────────────────────────────────────
 GEMINI_BASE = "https://generativelanguage.googleapis.com/v1beta/openai"
-
-# Fallback chain — each gets ONE attempt, no retries.
-# Order: lite first (most available), then mid, then flagship.
-# Rationale: for conversational follow-ups, the lite model is more than
-# capable and has the highest availability during demand spikes.
 GEMINI_MODELS = ["gemini-3.5-flash-lite", "gemini-3.5-flash", "gemini-3.8-flash"]
-
-# Per-request HTTP timeout (seconds).  Low enough so a single stuck
-# request never blocks more than ~5 s.
 _REQ_TIMEOUT = 5
-
-# Total wall-clock budget for the entire llm_followup() call (seconds).
-# If we've already spent this long trying models we bail immediately.
 _TOTAL_BUDGET = 8
 
 FOLLOWUP_SYSTEM_PROMPT = """\
@@ -69,7 +40,6 @@ CONVERSATION SO FAR:
 
 
 def _get_config() -> Optional[Dict[str, Any]]:
-    """Resolve API key and endpoint. Returns None if unconfigured."""
     # 1. Gemini (free)
     gemini_key = os.environ.get("GEMINI_API_KEY")
     if gemini_key:
@@ -95,7 +65,6 @@ def _get_config() -> Optional[Dict[str, Any]]:
 
 def _call_chat_once(config: Dict[str, Any], messages: List[Dict[str, Any]],
                     model: str, timeout: int = _REQ_TIMEOUT) -> Optional[str]:
-    """Single-shot chat completion — NO retries.  Fails fast on errors."""
     body = {
         "model": model,
         "messages": messages,
@@ -134,16 +103,6 @@ def _call_chat_once(config: Dict[str, Any], messages: List[Dict[str, Any]],
 def llm_followup(evidence: Dict[str, Any],
                  transcript: List[Dict[str, str]],
                  user_message: str) -> Optional[str]:
-    """
-    Generate a conversational follow-up reply using an LLM.
-
-    Tries each model in the fallback chain (gemini-3.8-flash → 3.5-flash →
-    3.5-flash-lite).  Each model gets exactly ONE attempt with an 8 s
-    timeout.  The entire function bails after 10 s wall-clock.
-
-    Returns the reply text, or None if all fail (caller falls back to the
-    deterministic PolicyPlanner responses).
-    """
     config = _get_config()
     if config is None:
         return None
@@ -200,5 +159,4 @@ def llm_followup(evidence: Dict[str, Any],
 
 
 def is_llm_available() -> bool:
-    """Check if any LLM API key is configured."""
     return _get_config() is not None

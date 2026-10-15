@@ -135,7 +135,6 @@ const services = [
 function ExpandedContent({ svc, isPreview = false }: { svc: typeof services[0]; isPreview?: boolean }) {
   return (
     <div className={`flex flex-col h-full w-full ${isPreview ? 'opacity-90' : 'opacity-100'}`}>
-      {/* --- Card Header Row --- */}
       <div className="flex flex-col sm:flex-row sm:items-start gap-4 sm:gap-5 mb-6">
         <div
           className={`w-14 h-14 sm:w-16 sm:h-16 shrink-0 rounded-xl bg-gradient-to-br from-white to-gray-50 flex items-center justify-center shadow-sm`}
@@ -148,7 +147,6 @@ function ExpandedContent({ svc, isPreview = false }: { svc: typeof services[0]; 
           </h3>
           <p className="text-muted text-sm">{svc.desc}</p>
         </div>
-        {/* --- Card Statistic --- */}
         <div className="text-left sm:text-right shrink-0">
           <div className={`text-2xl sm:text-3xl font-bold ${svc.iconColor}`}>
             {svc.details.stat}
@@ -159,12 +157,10 @@ function ExpandedContent({ svc, isPreview = false }: { svc: typeof services[0]; 
         </div>
       </div>
 
-      {/* --- Extended Description --- */}
       <p className="text-slate-600 text-sm leading-relaxed mb-6">
         {svc.details.longDesc}
       </p>
 
-      {/* --- Feature List --- */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-6">
         {svc.details.features.map((feat, fi) => (
           <motion.div
@@ -180,7 +176,6 @@ function ExpandedContent({ svc, isPreview = false }: { svc: typeof services[0]; 
         ))}
       </div>
 
-      {/* --- Call to Action --- */}
       <div className="mt-auto flex items-center gap-2 text-sm font-medium group/link cursor-pointer w-max">
         <span className={svc.iconColor}>Learn more</span>
         <ArrowRight
@@ -278,7 +273,6 @@ export default function Services() {
           </p>
         </FadeIn>
 
-        {/* --- Interactive Grid --- */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 relative">
           {services.map((svc, i) => {
             const isLocked = lockedIdx === i;
@@ -312,7 +306,6 @@ export default function Services() {
                 onMouseEnter={() => setHoveredIdx(i)}
                 onMouseLeave={() => setHoveredIdx(null)}
               >
-                {/* --- 1. BASE GRID CARD (Compact or Locked) --- */}
                 <motion.div
                   layout
                   onClick={() => setLockedIdx(isLocked ? null : i)}
@@ -364,7 +357,6 @@ export default function Services() {
                   </AnimatePresence>
                 </motion.div>
 
-                {/* --- 2. EXPANDED OVERLAY (Hover Preview) --- */}
                 <AnimatePresence>
                   {isHovered && !isLocked && (
                     <motion.div

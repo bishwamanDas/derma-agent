@@ -5,7 +5,7 @@ import { motion } from "framer-motion";
 import { useCounter } from "@/hooks/useCounter";
 import LesionTracks from "./LesionTracks";
 
-/* Fallbacks mirror backend/models/model_card.json until the API responds. */
+// model_card.json fallbacks
 const FALLBACK_ACCURACY = 75.6;
 const FALLBACK_BALANCED = 74.5;
 

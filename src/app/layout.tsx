@@ -37,7 +37,7 @@ export const metadata: Metadata = {
   },
 };
 
-// Runs before first paint so the stored/preferred theme applies with no flash.
+// prevent theme flash
 const themeInit = `(function(){try{var t=localStorage.getItem('helix-theme');if(!t){t=window.matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';}if(t==='dark'){document.documentElement.classList.add('dark');}}catch(e){}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

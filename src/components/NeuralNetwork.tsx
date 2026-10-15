@@ -65,7 +65,7 @@ export default function NeuralNetwork({ className = "" }: { className?: string }
   }, []);
 
   if (!mounted) {
-    return null; // Prevent hydration error by rendering only on client
+    return null;
   }
 
   return (
@@ -104,7 +104,7 @@ export default function NeuralNetwork({ className = "" }: { className?: string }
         {nodes.map((n) => {
           const dx = n.x - mousePos.x;
           const dy = n.y - mousePos.y;
-          const isHovered = (dx * dx + dy * dy) < 30; // Radius of interaction
+          const isHovered = (dx * dx + dy * dy) < 30;
 
           return (
             <circle
